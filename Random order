@@ -1,0 +1,114 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+void rule(int arr[][5], int first, int second);
+int check(int arr[][5]);
+int g_seed;
+
+int fastrand() {
+
+    g_seed = (214013 * g_seed + 2531011);
+
+    return (g_seed >> 16) & 0x7FFF;
+
+}
+
+int main()
+{
+    int result1[10];
+    int result2[10];
+
+    while(1) {
+        int a[5][5] = {
+                {-2, -2, 1,  -2, 1},
+                {1,  1,  -2, -2, -2},
+                {-2, 1,  -2, -2, -2},
+                {1,  -2, -2, 1,  -2},
+                {-2, 1,  1,  -2, 1}
+        }; //열림 = 1. 닫힘 = -2
+
+        for (int i = 0; i < 10; i++) {
+            int first = fastrand() % 5;
+            int second = fastrand() % 5;
+            result1[i] = first + 1;
+            result2[i] = second + 1;
+            rule(a, first, second);
+            if (check(a) == 1) {
+                printf("성공!\n");
+                break;
+            }
+        }
+        printf("결과 : ");
+        for(int i = 0; i < 10; i++)    //결과 출력
+        {
+            printf("%d.%d ", result1[i], result2[i]);
+        }
+        printf("\n");
+        if(check(a) == 1) break;
+    }
+    return 0;
+}
+
+void rule(int arr[][5], int first, int second)    //퍼즐의 기본 룰
+{
+    if(first >= 1 && first <= 3 && second >= 1 && second <= 3) //가운데
+    {
+        arr[first][second] = ~arr[first][second]; //중앙
+        arr[first-1][second] = ~arr[first-1][second]; //북
+        arr[first+1][second] = ~arr[first+1][second]; //남
+        arr[first][second-1] = ~arr[first][second-1]; //서
+        arr[first][second+1] = ~arr[first][second+1]; //동
+    }
+    else if(first == 0 && second >=0 && second <= 3) //위
+    {
+        arr[first][second] = ~arr[first][second]; //중앙
+        arr[first+1][second] = ~arr[first+1][second]; //남
+        arr[first][second-1] = ~arr[first][second-1]; //서
+        arr[first][second+1] = ~arr[first][second+1]; //동
+    }
+    else if(first == 0 && second == 4) //위
+    {
+        arr[first][second] = ~arr[first][second]; //중앙
+        arr[first+1][second] = ~arr[first+1][second]; //남
+        arr[first][second-1] = ~arr[first][second-1]; //서
+    }
+    else if(first == 4 && second >=1 && second <= 4) //아래
+    {
+        arr[first][second] = ~arr[first][second]; //중앙
+        arr[first-1][second] = ~arr[first-1][second]; //북
+        arr[first][second-1] = ~arr[first][second-1]; //서
+        arr[first][second+1] = ~arr[first][second+1]; //동
+    }
+    else if(first == 4 && second == 0) //아래
+    {
+        arr[first][second] = ~arr[first][second]; //중앙
+        arr[first-1][second] = ~arr[first-1][second]; //북
+        arr[first][second+1] = ~arr[first][second+1]; //동
+    }
+    else if(first >= 1 && first <= 3 && second == 0) //왼쪽
+    {
+        arr[first][second] = ~arr[first][second]; //중앙
+        arr[first-1][second] = ~arr[first-1][second]; //북
+        arr[first+1][second] = ~arr[first+1][second]; //남
+        arr[first][second+1] = ~arr[first][second+1]; //동
+    }
+    else if(first >= 1 && first <= 3 && second == 4) //오른쪽
+    {
+        arr[first][second] = ~arr[first][second]; //중앙
+        arr[first-1][second] = ~arr[first-1][second]; //북
+        arr[first+1][second] = ~arr[first+1][second]; //남
+        arr[first][second-1] = ~arr[first][second-1]; //서
+    }
+}
+
+int check(int arr[][5])    //퍼즐이 완성됐는지 확인
+{
+    int check = 0;
+    for(int i = 0; i < 25; i++)
+    {
+        check += arr[0][i];
+    }
+    if(check == 25) return 1; //모두 열렸으면 1을 반환
+    else return 0; //아니면 0을 반환
+}
